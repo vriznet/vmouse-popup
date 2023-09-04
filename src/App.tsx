@@ -1,11 +1,14 @@
 import { GlobalStyles } from './components/GlobalStyles';
+import Screen from './components/Screen';
+import Trackpad from './components/Trackpad';
 
 const App = () => {
   return (
     <>
       <GlobalStyles />
       <div>
-        <h1>React TypeScript Template</h1>
+        <Screen />
+        <Trackpad />
       </div>
     </>
   );
