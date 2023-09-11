@@ -1,3 +1,5 @@
+import { ComponentMouseActionState } from './states';
+
 export type Coord = {
   x: number;
   y: number;
@@ -21,3 +23,7 @@ export type ScreenComponentAppearances = {
 export type PartialScreenComponentAppearance = Partial<
   Record<keyof Appearance, any>
 >;
+
+export type ActionMap = {
+  [key in keyof ComponentMouseActionState]: () => void;
+};

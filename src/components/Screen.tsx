@@ -45,6 +45,8 @@ const Screen = () => {
 
   const [hoveredScreenComponentName, setHoveredScreenComponentName] =
     useState<ScreenComponentName>('');
+  const [prevHoveredScreenComponentName, setPrevHoveredScreenComponentName] =
+    useState<ScreenComponentName>('');
 
   const cursorCoordX = useSelector(selectCursorX);
   const cursorCoordY = useSelector(selectCursorY);
@@ -132,16 +134,26 @@ const Screen = () => {
           ...result,
           [name]: {
             ...prev[name],
-            isHovered: false,
+            isHoverStarted: false,
+            isHoverEnded: false,
           },
         }),
         {}
       ),
       [hoveredComponentName]: {
         ...prev[hoveredComponentName],
-        isHovered: true,
+        isHoverStarted: true,
       },
     }));
+    setTimeout(() => {
+      setScreenComponentMouseActionStates((prev) => ({
+        ...prev,
+        [hoveredComponentName]: {
+          ...prev[hoveredComponentName],
+          isHoverStarted: false,
+        },
+      }));
+    }, 1);
     setHoveredScreenComponentName(hoveredComponentName);
   }, [cursorCoordX, cursorCoordY, screenComponentAppearances]);
 
@@ -153,14 +165,40 @@ const Screen = () => {
         return acc;
       }, {} as ScreenComponentMouseActionStates),
     }));
+    if (hoveredScreenComponentName !== prevHoveredScreenComponentName) {
+      setScreenComponentMouseActionStates((prev) => ({
+        ...prev,
+        [prevHoveredScreenComponentName]: {
+          ...prev[prevHoveredScreenComponentName],
+          isHoverEnded: true,
+        },
+      }));
+      setTimeout(() => {
+        setScreenComponentMouseActionStates((prev) => ({
+          ...prev,
+          [prevHoveredScreenComponentName]: {
+            ...prev[prevHoveredScreenComponentName],
+            isHoverEnded: false,
+          },
+        }));
+      }, 1);
+      setPrevHoveredScreenComponentName(hoveredScreenComponentName);
+    }
     setScreenComponentMouseActionStates((prev) => ({
       ...prev,
       [hoveredScreenComponentName]: {
         ...prev[hoveredScreenComponentName],
-        ...mouseActionState,
+        isShortClicked: mouseActionState.isShortClicked,
+        isDblClicked: mouseActionState.isDblClicked,
+        isLongClickStarted: mouseActionState.isLongClickStarted,
+        isLongClickEnded: mouseActionState.isLongClickEnded,
       },
     }));
-  }, [hoveredScreenComponentName, mouseActionState]);
+  }, [
+    hoveredScreenComponentName,
+    mouseActionState,
+    prevHoveredScreenComponentName,
+  ]);
 
   return (
     <Container>

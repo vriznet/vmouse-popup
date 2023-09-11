@@ -7,7 +7,7 @@ import {
   setClickedCoord,
   updateMouseActionState,
 } from '../redux/module/mouseSlice';
-import { useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 
 const MouseButtonSC = styled.div`
   width: 100%;
@@ -182,4 +182,4 @@ const MouseButton = () => {
   return <MouseButtonSC id="mouse-btn" />;
 };
 
-export default MouseButton;
+export default memo(MouseButton);

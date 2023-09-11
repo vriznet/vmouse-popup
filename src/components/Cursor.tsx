@@ -13,16 +13,17 @@ interface ICursorSCProps {
 
 const CursorSC = styled.div.attrs<ICursorSCProps>((props) => ({
   style: {
-    top: `${props.y}px`,
-    left: `${props.x}px`,
+    top: `${props.y - 6}px`,
+    left: `${props.x - 6}px`,
   },
 }))`
   position: absolute;
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background-color: #000;
+  background-color: #aaa;
   opacity: 0.5;
+  z-index: 999;
 `;
 
 const Cursor = (props: ICursorProps) => {

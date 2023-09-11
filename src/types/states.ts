@@ -10,7 +10,8 @@ export type MouseActionState = {
 };
 
 export type ComponentMouseActionState = {
-  isHovered: boolean;
+  isHoverStarted: boolean;
+  isHoverEnded: boolean;
   isShortClicked: boolean;
   isDblClicked: boolean;
   isLongClickStarted: boolean;
