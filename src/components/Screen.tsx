@@ -206,6 +206,18 @@ const Screen = () => {
       <Button
         ref={buttonRef}
         mouseActionState={screenComponentMouseActionStates.button}
+        onVShortClick={() => {
+          console.log('button short clicked');
+        }}
+        onVDblClick={() => {
+          console.log('button double clicked');
+        }}
+        onVLongClickStart={() => {
+          console.log('button long click started');
+        }}
+        onVLongClickEnd={() => {
+          console.log('button long click ended');
+        }}
       />
     </Container>
   );

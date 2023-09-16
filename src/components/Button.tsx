@@ -28,10 +28,10 @@ const Button = forwardRef<HTMLDivElement, IButtonProps>((props, ref) => {
     isHoverEnded: () => {
       setIsButtonHovered(false);
     },
-    isShortClicked: () => console.log('open popup'),
-    isDblClicked: () => console.log('open popup double'),
-    isLongClickStarted: () => console.log('open popup long start'),
-    isLongClickEnded: () => console.log('open popup long end'),
+    isShortClicked: () => props.onVShortClick(),
+    isDblClicked: () => props.onVDblClick(),
+    isLongClickStarted: () => props.onVLongClickStart(),
+    isLongClickEnded: () => props.onVLongClickEnd(),
   };
 
   useVMouseAction(props.mouseActionState, actionMap);
