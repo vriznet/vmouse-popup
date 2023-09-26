@@ -3,11 +3,13 @@ import {
   PartialScreenComponentAppearance,
   ScreenComponentAppearances,
   ScreenComponentName,
-} from './data';
-import { RootState } from '../redux/module';
+  ScreenComponentVisibilities,
+} from '../../types/data';
+import { RootState } from '.';
 
 export interface ScreenState {
   screenComponentAppearances: ScreenComponentAppearances;
+  screenComponentVisibilities: ScreenComponentVisibilities;
 }
 
 const initialState: ScreenState = {
@@ -17,7 +19,6 @@ const initialState: ScreenState = {
       y: 0,
       width: 320,
       height: 240,
-      isVisible: false,
       zIndex: 0,
     },
     popup: {
@@ -25,15 +26,13 @@ const initialState: ScreenState = {
       y: 40,
       width: 160,
       height: 100,
-      isVisible: false,
-      zIndex: 100,
+      zIndex: 998,
     },
     modal: {
       x: 40,
       y: 40,
       width: 160,
       height: 100,
-      isVisible: false,
       zIndex: 101,
     },
     button: {
@@ -41,9 +40,14 @@ const initialState: ScreenState = {
       y: 80,
       width: 120,
       height: 100,
-      isVisible: true,
       zIndex: 10,
     },
+  },
+  screenComponentVisibilities: {
+    '': true,
+    popup: false,
+    modal: false,
+    button: true,
   },
 };
 
@@ -73,15 +77,34 @@ export const screenSlice = createSlice({
         },
       };
     },
+    updateScreenComponentVisibility(
+      state,
+      action: {
+        payload: {
+          componentName: ScreenComponentName;
+          visibility: boolean;
+        };
+      }
+    ) {
+      state.screenComponentVisibilities = {
+        ...state.screenComponentVisibilities,
+        ...{
+          [action.payload.componentName]: action.payload.visibility,
+        },
+      };
+    },
   },
 });
 
 export const {
   setScreenComponentAppearances,
   updateScreenComponentAppearance,
+  updateScreenComponentVisibility,
 } = screenSlice.actions;
 
 export const selectScreenComponentAppearances = (state: RootState) =>
   state.screen.screenComponentAppearances;
+export const selectScreenComponentVisibilities = (state: RootState) =>
+  state.screen.screenComponentVisibilities;
 
 export default screenSlice.reducer;

@@ -9,8 +9,10 @@ import {
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   selectScreenComponentAppearances,
+  selectScreenComponentVisibilities,
   updateScreenComponentAppearance,
-} from '../types/screenSlice';
+  updateScreenComponentVisibility,
+} from '../redux/module/screenSlice';
 import Button from './Button';
 import { ScreenComponentMouseActionStates } from '../types/states';
 import {
@@ -23,6 +25,7 @@ import {
   ScreenComponentAppearances,
   ScreenComponentName,
 } from '../types/data';
+import Popup from './Popup';
 
 const Container = styled.div`
   position: relative;
@@ -55,9 +58,14 @@ const Screen = () => {
     selectScreenComponentAppearances
   );
 
+  const screenComponentVisibilities = useSelector(
+    selectScreenComponentVisibilities
+  );
+
   const mouseActionState = useSelector(selectMouseActionState);
 
   const buttonRef = useRef<HTMLDivElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
 
@@ -72,16 +80,17 @@ const Screen = () => {
       let key: keyof ScreenComponentAppearances;
       for (key in screenComponentAppearances) {
         const appearanceData = screenComponentAppearances[key];
+        const visibilityData = screenComponentVisibilities[key];
         if (
           appearanceData.x + appearanceData.width >= point.x &&
           appearanceData.y + appearanceData.height >= point.y &&
           appearanceData.x < point.x &&
           appearanceData.y < point.y &&
-          appearanceData.isVisible
+          visibilityData
         ) {
           screenComponentNameAndVisibilityAndZIndexes.push({
             name: key,
-            isVisible: appearanceData.isVisible,
+            isVisible: visibilityData,
             zIndex: appearanceData.zIndex,
           });
         }
@@ -94,7 +103,7 @@ const Screen = () => {
         ? sortedNameAndVisibilityAndZIndexes[0].name
         : '';
     },
-    [screenComponentAppearances]
+    [screenComponentAppearances, screenComponentVisibilities]
   );
 
   useEffect(() => {
@@ -105,7 +114,6 @@ const Screen = () => {
         window.getComputedStyle(button).zIndex || '0',
         10
       );
-      const displayStyle = window.getComputedStyle(button).display;
       dispatch(
         updateScreenComponentAppearance({
           componentName: 'button',
@@ -114,7 +122,6 @@ const Screen = () => {
             y,
             width,
             height,
-            isVisible: displayStyle && displayStyle !== 'none' ? true : false,
             zIndex,
           },
         })
@@ -123,10 +130,46 @@ const Screen = () => {
   }, []);
 
   useEffect(() => {
+    const popup = popupRef.current;
+    if (popup && screenComponentVisibilities.popup) {
+      const { x, y, width, height } = popup.getBoundingClientRect();
+      const zIndex = parseInt(window.getComputedStyle(popup).zIndex || '0', 10);
+      dispatch(
+        updateScreenComponentAppearance({
+          componentName: 'popup',
+          appearance: {
+            x,
+            y,
+            width,
+            height,
+            zIndex,
+          },
+        })
+      );
+    }
+  }, [screenComponentVisibilities.popup]);
+
+  useEffect(() => {
     const hoveredComponentName = getScreenComponentNameFromPoint({
       x: cursorCoordX,
       y: cursorCoordY,
     });
+    setHoveredScreenComponentName(hoveredComponentName);
+  }, [
+    cursorCoordX,
+    cursorCoordY,
+    screenComponentAppearances,
+    screenComponentVisibilities,
+  ]);
+
+  useEffect(() => {
+    setScreenComponentMouseActionStates((prev) => ({
+      ...prev,
+      ...screenComponentNameList.reduce((acc, name) => {
+        acc[name] = initialComponentMouseActionState;
+        return acc;
+      }, {} as ScreenComponentMouseActionStates),
+    }));
     setScreenComponentMouseActionStates((prev) => ({
       ...prev,
       ...screenComponentNameList.reduce(
@@ -140,31 +183,20 @@ const Screen = () => {
         }),
         {}
       ),
-      [hoveredComponentName]: {
-        ...prev[hoveredComponentName],
+      [hoveredScreenComponentName]: {
+        ...prev[hoveredScreenComponentName],
         isHoverStarted: true,
       },
     }));
     setTimeout(() => {
       setScreenComponentMouseActionStates((prev) => ({
         ...prev,
-        [hoveredComponentName]: {
-          ...prev[hoveredComponentName],
+        [hoveredScreenComponentName]: {
+          ...prev[hoveredScreenComponentName],
           isHoverStarted: false,
         },
       }));
     }, 1);
-    setHoveredScreenComponentName(hoveredComponentName);
-  }, [cursorCoordX, cursorCoordY, screenComponentAppearances]);
-
-  useEffect(() => {
-    setScreenComponentMouseActionStates((prev) => ({
-      ...prev,
-      ...screenComponentNameList.reduce((acc, name) => {
-        acc[name] = initialComponentMouseActionState;
-        return acc;
-      }, {} as ScreenComponentMouseActionStates),
-    }));
     if (hoveredScreenComponentName !== prevHoveredScreenComponentName) {
       setScreenComponentMouseActionStates((prev) => ({
         ...prev,
@@ -207,7 +239,12 @@ const Screen = () => {
         ref={buttonRef}
         mouseActionState={screenComponentMouseActionStates.button}
         onVShortClick={() => {
-          console.log('button short clicked');
+          dispatch(
+            updateScreenComponentVisibility({
+              componentName: 'popup',
+              visibility: true,
+            })
+          );
         }}
         onVDblClick={() => {
           console.log('button double clicked');
@@ -218,6 +255,11 @@ const Screen = () => {
         onVLongClickEnd={() => {
           console.log('button long click ended');
         }}
+      />
+      <Popup
+        ref={popupRef}
+        mouseActionState={screenComponentMouseActionStates.popup}
+        isVisible={screenComponentVisibilities.popup}
       />
     </Container>
   );

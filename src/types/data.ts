@@ -10,7 +10,6 @@ export type Appearance = {
   y: number;
   width: number;
   height: number;
-  isVisible: boolean;
   zIndex: number;
 };
 
@@ -18,6 +17,10 @@ export type ScreenComponentName = '' | 'popup' | 'modal' | 'button';
 
 export type ScreenComponentAppearances = {
   [componentName in ScreenComponentName]: Appearance;
+};
+
+export type ScreenComponentVisibilities = {
+  [componentName in ScreenComponentName]: boolean;
 };
 
 export type PartialScreenComponentAppearance = Partial<

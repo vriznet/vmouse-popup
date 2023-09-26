@@ -7,3 +7,8 @@ export interface IButtonProps {
   onVLongClickStart: () => void;
   onVLongClickEnd: () => void;
 }
+
+export interface IPopupProps {
+  mouseActionState: ComponentMouseActionState;
+  isVisible: boolean;
+}
