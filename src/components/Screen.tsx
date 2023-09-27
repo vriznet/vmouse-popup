@@ -170,50 +170,7 @@ const Screen = () => {
         return acc;
       }, {} as ScreenComponentMouseActionStates),
     }));
-    setScreenComponentMouseActionStates((prev) => ({
-      ...prev,
-      ...screenComponentNameList.reduce(
-        (result, name) => ({
-          ...result,
-          [name]: {
-            ...prev[name],
-            isHoverStarted: false,
-            isHoverEnded: false,
-          },
-        }),
-        {}
-      ),
-      [hoveredScreenComponentName]: {
-        ...prev[hoveredScreenComponentName],
-        isHoverStarted: true,
-      },
-    }));
-    setTimeout(() => {
-      setScreenComponentMouseActionStates((prev) => ({
-        ...prev,
-        [hoveredScreenComponentName]: {
-          ...prev[hoveredScreenComponentName],
-          isHoverStarted: false,
-        },
-      }));
-    }, 1);
     if (hoveredScreenComponentName !== prevHoveredScreenComponentName) {
-      setScreenComponentMouseActionStates((prev) => ({
-        ...prev,
-        [prevHoveredScreenComponentName]: {
-          ...prev[prevHoveredScreenComponentName],
-          isHoverEnded: true,
-        },
-      }));
-      setTimeout(() => {
-        setScreenComponentMouseActionStates((prev) => ({
-          ...prev,
-          [prevHoveredScreenComponentName]: {
-            ...prev[prevHoveredScreenComponentName],
-            isHoverEnded: false,
-          },
-        }));
-      }, 1);
       setPrevHoveredScreenComponentName(hoveredScreenComponentName);
     }
     setScreenComponentMouseActionStates((prev) => ({
@@ -238,6 +195,7 @@ const Screen = () => {
       <Button
         ref={buttonRef}
         mouseActionState={screenComponentMouseActionStates.button}
+        isHovered={hoveredScreenComponentName === 'button'}
         onVShortClick={() => {
           dispatch(
             updateScreenComponentVisibility({
@@ -259,6 +217,7 @@ const Screen = () => {
       <Popup
         ref={popupRef}
         mouseActionState={screenComponentMouseActionStates.popup}
+        isHovered={hoveredScreenComponentName === 'popup'}
         isVisible={screenComponentVisibilities.popup}
       />
     </Container>

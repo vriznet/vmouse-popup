@@ -1,8 +1,6 @@
 import { ScreenComponentName } from './types/data';
 
 export const initialComponentMouseActionState = {
-  isHoverStarted: false,
-  isHoverEnded: false,
   isShortClicked: false,
   isDblClicked: false,
   isLongClickStarted: false,

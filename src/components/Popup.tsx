@@ -1,11 +1,10 @@
-import { forwardRef, memo, useState } from 'react';
+import { forwardRef, memo } from 'react';
 import styled from 'styled-components';
 import { IPopupProps } from '../types/props';
 import { ActionMap } from '../types/data';
 import useVMouseAction from '../hooks/useVMouseAction';
 import { useDispatch } from 'react-redux';
 import { updateScreenComponentVisibility } from '../redux/module/screenSlice';
-import { updateMouseActionState } from '../redux/module/mouseSlice';
 
 interface IPopupSCProps {
   $isHovered: boolean;
@@ -14,9 +13,9 @@ interface IPopupSCProps {
 
 const PopupSC = styled.div<IPopupSCProps>`
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: 40px;
+  left: 40px;
+  width: 240px;
   height: 160px;
   border: 1px solid #000;
   z-index: 998;
@@ -26,17 +25,9 @@ const PopupSC = styled.div<IPopupSCProps>`
 `;
 
 const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
-  const [isPopupHovered, setIsPopupHovered] = useState(false);
-
   const dispatch = useDispatch();
 
   const actionMap: ActionMap = {
-    isHoverStarted() {
-      setIsPopupHovered(true);
-    },
-    isHoverEnded() {
-      setIsPopupHovered(false);
-    },
     isShortClicked() {
       dispatch(
         updateScreenComponentVisibility({
@@ -44,39 +35,20 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
           visibility: false,
         })
       );
-      dispatch(
-        updateMouseActionState({
-          isShortClicked: false,
-        })
-      );
     },
-    isDblClicked() {
-      dispatch(
-        updateMouseActionState({
-          isDblClicked: false,
-        })
-      );
-    },
-    isLongClickStarted() {
-      dispatch(
-        updateMouseActionState({
-          isLongClickStarted: false,
-        })
-      );
-    },
-    isLongClickEnded() {
-      dispatch(
-        updateMouseActionState({
-          isLongClickEnded: false,
-        })
-      );
-    },
+    isDblClicked() {},
+    isLongClickStarted() {},
+    isLongClickEnded() {},
   };
 
   useVMouseAction(props.mouseActionState, actionMap);
 
   return (
-    <PopupSC ref={ref} $isHovered={isPopupHovered} $isVisible={props.isVisible}>
+    <PopupSC
+      ref={ref}
+      $isHovered={props.isHovered}
+      $isVisible={props.isVisible}
+    >
       Popup
     </PopupSC>
   );

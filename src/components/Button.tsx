@@ -1,10 +1,8 @@
-import { forwardRef, memo, useState } from 'react';
+import { forwardRef, memo } from 'react';
 import { styled } from 'styled-components';
 import { IButtonProps } from '../types/props';
 import useVMouseAction from '../hooks/useVMouseAction';
 import { ActionMap } from '../types/data';
-import { useDispatch } from 'react-redux';
-import { updateMouseActionState } from '../redux/module/mouseSlice';
 
 interface IButtonSCProps {
   $isHovered: boolean;
@@ -21,55 +19,25 @@ const ButtonSC = styled.div<IButtonSCProps>`
 `;
 
 const Button = forwardRef<HTMLDivElement, IButtonProps>((props, ref) => {
-  const [isButtonHovered, setIsButtonHovered] = useState(false);
-
-  const dispatch = useDispatch();
-
   const actionMap: ActionMap = {
-    isHoverStarted() {
-      setIsButtonHovered(true);
-    },
-    isHoverEnded() {
-      setIsButtonHovered(false);
-    },
     isShortClicked() {
       props.onVShortClick();
-      dispatch(
-        updateMouseActionState({
-          isShortClicked: false,
-        })
-      );
     },
     isDblClicked() {
       props.onVDblClick();
-      dispatch(
-        updateMouseActionState({
-          isDblClicked: false,
-        })
-      );
     },
     isLongClickStarted() {
       props.onVLongClickStart();
-      dispatch(
-        updateMouseActionState({
-          isLongClickStarted: false,
-        })
-      );
     },
     isLongClickEnded() {
       props.onVLongClickEnd();
-      dispatch(
-        updateMouseActionState({
-          isLongClickEnded: false,
-        })
-      );
     },
   };
 
   useVMouseAction(props.mouseActionState, actionMap);
 
   return (
-    <ButtonSC ref={ref} $isHovered={isButtonHovered}>
+    <ButtonSC ref={ref} $isHovered={props.isHovered}>
       Open Popup
     </ButtonSC>
   );

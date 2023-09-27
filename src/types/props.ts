@@ -2,6 +2,7 @@ import { ComponentMouseActionState } from './states';
 
 export interface IButtonProps {
   mouseActionState: ComponentMouseActionState;
+  isHovered: boolean;
   onVShortClick: () => void;
   onVDblClick: () => void;
   onVLongClickStart: () => void;
@@ -11,4 +12,5 @@ export interface IButtonProps {
 export interface IPopupProps {
   mouseActionState: ComponentMouseActionState;
   isVisible: boolean;
+  isHovered: boolean;
 }
