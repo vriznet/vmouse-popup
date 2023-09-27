@@ -1,10 +1,11 @@
-import { forwardRef, memo } from 'react';
+import { forwardRef, memo, useEffect } from 'react';
 import styled from 'styled-components';
 import { IPopupProps } from '../types/props';
 import { ActionMap } from '../types/data';
 import useVMouseAction from '../hooks/useVMouseAction';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateScreenComponentVisibility } from '../redux/module/screenSlice';
+import { selectMouseActionState } from '../redux/module/mouseSlice';
 
 interface IPopupSCProps {
   $isHovered: boolean;
@@ -27,21 +28,32 @@ const PopupSC = styled.div<IPopupSCProps>`
 const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   const dispatch = useDispatch();
 
+  const mouseActionState = useSelector(selectMouseActionState);
+
   const actionMap: ActionMap = {
-    isShortClicked() {
-      dispatch(
-        updateScreenComponentVisibility({
-          componentName: 'popup',
-          visibility: false,
-        })
-      );
-    },
+    isShortClicked() {},
     isDblClicked() {},
     isLongClickStarted() {},
     isLongClickEnded() {},
   };
 
   useVMouseAction(props.mouseActionState, actionMap);
+
+  useEffect(() => {
+    if (
+      (mouseActionState.isShortClicked ||
+        mouseActionState.isLongClickEnded ||
+        mouseActionState.isDblClicked) &&
+      !props.isHovered
+    ) {
+      dispatch(
+        updateScreenComponentVisibility({
+          componentName: 'popup',
+          visibility: false,
+        })
+      );
+    }
+  }, [mouseActionState]);
 
   return (
     <PopupSC
