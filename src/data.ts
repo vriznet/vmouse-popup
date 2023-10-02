@@ -1,4 +1,4 @@
-import { ScreenComponentName } from './types/data';
+import { PopupComponentName, ScreenComponentName } from './types/data';
 
 export const initialComponentMouseActionState = {
   isShortClicked: false,
@@ -20,3 +20,11 @@ export const screenComponentNameList: ScreenComponentName[] = [
   'modal',
   'button',
 ];
+
+export const popupComponentNameList: PopupComponentName[] = ['', 'close', 'ok'];
+
+export const initialPopupComponentMouseActionStates = {
+  '': initialComponentMouseActionState,
+  close: initialComponentMouseActionState,
+  ok: initialComponentMouseActionState,
+};

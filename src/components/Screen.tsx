@@ -219,6 +219,8 @@ const Screen = () => {
         mouseActionState={screenComponentMouseActionStates.popup}
         isHovered={hoveredScreenComponentName === 'popup'}
         isVisible={screenComponentVisibilities.popup}
+        title="로그인 여부 확인"
+        content="로그인 하시겠습니까?"
       />
     </Container>
   );

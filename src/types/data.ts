@@ -30,3 +30,13 @@ export type PartialScreenComponentAppearance = Partial<
 export type ActionMap = {
   [key in keyof ComponentMouseActionState]: () => void;
 };
+
+export type PopupComponentName = '' | 'close' | 'ok';
+
+export type PopupComponentAppearances = {
+  [componentName in PopupComponentName]: Appearance;
+};
+
+export type PartialPopupComponentAppearance = Partial<
+  Record<keyof Appearance, any>
+>;

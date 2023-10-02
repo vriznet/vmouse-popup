@@ -1,4 +1,4 @@
-import { ScreenComponentName } from './data';
+import { PopupComponentName, ScreenComponentName } from './data';
 
 export type MouseActionState = {
   isClicking: boolean;
@@ -18,4 +18,8 @@ export type ComponentMouseActionState = {
 
 export type ScreenComponentMouseActionStates = {
   [componentName in ScreenComponentName]: ComponentMouseActionState;
+};
+
+export type PopupComponentMouseActionStates = {
+  [componentName in PopupComponentName]: ComponentMouseActionState;
 };
