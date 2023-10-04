@@ -24,3 +24,10 @@ export interface IPopupCloseButtonProps {
   isHovered: boolean;
   setHoveredPopupComponentName: Dispatch<SetStateAction<PopupComponentName>>;
 }
+
+export interface IPopupOkButtonProps {
+  mouseActionState: ComponentMouseActionState;
+  isHovered: boolean;
+  setHoveredPopupComponentName: Dispatch<SetStateAction<PopupComponentName>>;
+  okMessage: string;
+}

@@ -33,6 +33,7 @@ import {
   updatePopupComponentAppearance,
 } from '../redux/module/popupSlice';
 import PopupCloseButton from './PopupCloseButton';
+import PopupOkButton from './PopupOkButton';
 
 interface IPopupContainerProps {
   $isHovered: boolean;
@@ -48,13 +49,15 @@ const PopupContainer = styled.div<IPopupContainerProps>`
   top: 40px;
   left: 40px;
   width: 240px;
-  height: 160px;
   border: 1px solid #000;
   z-index: 998;
   color: ${(props) => (props.$isHovered ? '#fff' : '#000')};
   background-color: ${(props) => (props.$isHovered ? '#000' : '#fff')};
   display: ${(props) => (props.$isVisible ? 'flex' : 'none')};
   flex-direction: column;
+  padding-bottom: 16px;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const PopupHeader = styled.header<IPopupHeaderProps>`
@@ -72,8 +75,8 @@ const PopupHeader = styled.header<IPopupHeaderProps>`
 const PopupTitle = styled.h1``;
 
 const PopupContent = styled.div`
-  padding: 8px;
-  height: 100%;
+  padding: 24px 0 16px 0;
+  height: 24px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -100,6 +103,7 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   const mouseActionState = useSelector(selectMouseActionState);
 
   const closeButtonRef = useRef<HTMLDivElement>(null);
+  const okButtonRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
 
@@ -153,6 +157,23 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
         dispatch(
           updatePopupComponentAppearance({
             componentName: 'close',
+            appearance: {
+              x,
+              y,
+              width,
+              height,
+              zIndex,
+            },
+          })
+        );
+      }
+      const okButton = okButtonRef.current;
+      if (okButton) {
+        const { x, y, width, height } = okButton.getBoundingClientRect();
+        const zIndex = parseInt(okButton.style.zIndex || '0', 10);
+        dispatch(
+          updatePopupComponentAppearance({
+            componentName: 'ok',
             appearance: {
               x,
               y,
@@ -242,6 +263,13 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
       <PopupContent>
         <p>{props.content}</p>
       </PopupContent>
+      <PopupOkButton
+        ref={okButtonRef}
+        mouseActionState={popupComponentMouseActionStates.ok}
+        isHovered={hoveredPopupComponentName === 'ok'}
+        setHoveredPopupComponentName={setHoveredPopupComponentName}
+        okMessage="확인"
+      />
     </PopupContainer>
   );
 });
