@@ -38,6 +38,7 @@ import PopupOkButton from './PopupOkButton';
 interface IPopupContainerProps {
   $isHovered: boolean;
   $isVisible: boolean;
+  $coord: Coord;
 }
 
 interface IPopupHeaderProps {
@@ -46,8 +47,8 @@ interface IPopupHeaderProps {
 
 const PopupContainer = styled.div<IPopupContainerProps>`
   position: absolute;
-  top: 40px;
-  left: 40px;
+  top: ${(props) => props.$coord.x}px;
+  left: ${(props) => props.$coord.y}px;
   width: 240px;
   border: 1px solid #000;
   z-index: 998;
@@ -153,13 +154,22 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
       const closeButton = closeButtonRef.current;
       if (closeButton) {
         const { x, y, width, height } = closeButton.getBoundingClientRect();
-        const zIndex = parseInt(closeButton.style.zIndex || '0', 10);
+        const computedStyle = window.getComputedStyle(closeButton);
+        const zIndex = parseInt(computedStyle.zIndex || '0', 10);
+        const borderLeftWidth = parseInt(
+          computedStyle.borderLeftWidth || '0',
+          10
+        );
+        const borderTopWidth = parseInt(
+          computedStyle.borderTopWidth || '0',
+          10
+        );
         dispatch(
           updatePopupComponentAppearance({
             componentName: 'close',
             appearance: {
-              x,
-              y,
+              x: x - borderLeftWidth,
+              y: y - borderTopWidth,
               width,
               height,
               zIndex,
@@ -170,13 +180,22 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
       const okButton = okButtonRef.current;
       if (okButton) {
         const { x, y, width, height } = okButton.getBoundingClientRect();
-        const zIndex = parseInt(okButton.style.zIndex || '0', 10);
+        const computedStyle = window.getComputedStyle(okButton);
+        const zIndex = parseInt(computedStyle.zIndex || '0', 10);
+        const borderLeftWidth = parseInt(
+          computedStyle.borderLeftWidth || '0',
+          10
+        );
+        const borderTopWidth = parseInt(
+          computedStyle.borderTopWidth || '0',
+          10
+        );
         dispatch(
           updatePopupComponentAppearance({
             componentName: 'ok',
             appearance: {
-              x,
-              y,
+              x: x - borderLeftWidth,
+              y: y - borderTopWidth,
               width,
               height,
               zIndex,
@@ -248,6 +267,7 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   return (
     <PopupContainer
       ref={ref}
+      $coord={props.coord}
       $isHovered={props.isHovered}
       $isVisible={props.isVisible}
     >

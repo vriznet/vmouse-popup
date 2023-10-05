@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { ComponentMouseActionState } from './states';
-import { PopupComponentName } from './data';
+import { Coord, PopupComponentName } from './data';
 
 export interface IButtonProps {
   mouseActionState: ComponentMouseActionState;
@@ -17,6 +17,7 @@ export interface IPopupProps {
   isHovered: boolean;
   title: string;
   content: string;
+  coord: Coord;
 }
 
 export interface IPopupCloseButtonProps {

@@ -133,13 +133,19 @@ const Screen = () => {
     const popup = popupRef.current;
     if (popup && screenComponentVisibilities.popup) {
       const { x, y, width, height } = popup.getBoundingClientRect();
-      const zIndex = parseInt(window.getComputedStyle(popup).zIndex || '0', 10);
+      const computedStyle = window.getComputedStyle(popup);
+      const zIndex = parseInt(computedStyle.zIndex || '0', 10);
+      const borderLeftWidth = parseInt(
+        computedStyle.borderLeftWidth || '0',
+        10
+      );
+      const borderTopWidth = parseInt(computedStyle.borderTopWidth || '0', 10);
       dispatch(
         updateScreenComponentAppearance({
           componentName: 'popup',
           appearance: {
-            x,
-            y,
+            x: x - borderLeftWidth,
+            y: y - borderTopWidth,
             width,
             height,
             zIndex,
@@ -221,6 +227,10 @@ const Screen = () => {
         isVisible={screenComponentVisibilities.popup}
         title="로그인 여부 확인"
         content="로그인 하시겠습니까?"
+        coord={{
+          x: screenComponentAppearances.popup.x,
+          y: screenComponentAppearances.popup.y,
+        }}
       />
     </Container>
   );
