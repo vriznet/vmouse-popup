@@ -11,6 +11,7 @@ export type Appearance = {
   width: number;
   height: number;
   zIndex: number;
+  lastClickedCoord: Coord;
 };
 
 export type ScreenComponentName = '' | 'popup' | 'modal' | 'button';

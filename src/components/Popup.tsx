@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {
   forwardRef,
   memo,
@@ -47,8 +48,8 @@ interface IPopupHeaderProps {
 
 const PopupContainer = styled.div<IPopupContainerProps>`
   position: absolute;
-  top: ${(props) => props.$coord.x}px;
-  left: ${(props) => props.$coord.y}px;
+  top: ${(props) => props.$coord.y}px;
+  left: ${(props) => props.$coord.x}px;
   width: 240px;
   border: 1px solid #000;
   z-index: 998;

@@ -1,13 +1,16 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { styled } from 'styled-components';
 import Cursor from './Cursor';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  selectClickedCoord,
   selectCursorX,
   selectCursorY,
   selectMouseActionState,
 } from '../redux/module/mouseSlice';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
+  deltaUpdateScreenComponentCoord,
   selectScreenComponentAppearances,
   selectScreenComponentVisibilities,
   updateScreenComponentAppearance,
@@ -26,6 +29,10 @@ import {
   ScreenComponentName,
 } from '../types/data';
 import Popup from './Popup';
+import {
+  deltaUpdateAllPopupComponentAppearances,
+  updateAllPopupComponentsLastClickedCoord,
+} from '../redux/module/popupSlice';
 
 const Container = styled.div`
   position: relative;
@@ -61,6 +68,8 @@ const Screen = () => {
   const screenComponentVisibilities = useSelector(
     selectScreenComponentVisibilities
   );
+
+  const clickedCoord = useSelector(selectClickedCoord);
 
   const mouseActionState = useSelector(selectMouseActionState);
 
@@ -193,6 +202,49 @@ const Screen = () => {
     hoveredScreenComponentName,
     mouseActionState,
     prevHoveredScreenComponentName,
+  ]);
+
+  useEffect(() => {
+    if (mouseActionState.isClickStarted === true) {
+      dispatch(
+        updateScreenComponentAppearance({
+          componentName: hoveredScreenComponentName,
+          appearance: {
+            lastClickedCoord: {
+              x: screenComponentAppearances[hoveredScreenComponentName].x,
+              y: screenComponentAppearances[hoveredScreenComponentName].y,
+            },
+          },
+        })
+      );
+      dispatch(updateAllPopupComponentsLastClickedCoord());
+    }
+  }, [mouseActionState.isClickStarted, hoveredScreenComponentName]);
+
+  useEffect(() => {
+    if (mouseActionState.isClicking) {
+      if (hoveredScreenComponentName === 'popup') {
+        dispatch(
+          deltaUpdateScreenComponentCoord({
+            componentName: 'popup',
+            deltaX: cursorCoordX - clickedCoord.x,
+            deltaY: cursorCoordY - clickedCoord.y,
+          })
+        );
+        dispatch(
+          deltaUpdateAllPopupComponentAppearances({
+            deltaX: cursorCoordX - clickedCoord.x,
+            deltaY: cursorCoordY - clickedCoord.y,
+          })
+        );
+      }
+    }
+  }, [
+    mouseActionState.isClicking,
+    hoveredScreenComponentName,
+    cursorCoordX,
+    cursorCoordY,
+    clickedCoord,
   ]);
 
   return (
