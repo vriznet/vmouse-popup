@@ -17,6 +17,7 @@ const initialState: MouseState = {
   mouseActionState: {
     isClicking: false,
     isClickStarted: false,
+    isClickEnded: false,
     isShortClicked: false,
     isDblClicked: false,
     isLongClickStarted: false,
@@ -35,8 +36,6 @@ export const mouseSlice = createSlice({
       state.cursorY = action.payload;
     },
     setClickedCoord(state, action) {
-      console.log('set clicked coord');
-      console.log(action.payload);
       state.clickedCoord = action.payload;
     },
     setMouseActionState(state, action: { payload: MouseActionState }) {
@@ -46,11 +45,6 @@ export const mouseSlice = createSlice({
       state,
       action: { payload: Partial<MouseActionState> }
     ) {
-      console.log('update mouse action state');
-      console.log('isClicking:');
-      console.log(state.mouseActionState.isClicking);
-      console.log('isClickStarted:');
-      console.log(state.mouseActionState.isClickStarted);
       state.mouseActionState = {
         ...state.mouseActionState,
         ...action.payload,

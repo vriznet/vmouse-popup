@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
   PartialPopupComponentAppearance,
   PopupComponentAppearances,
+  PopupComponentLastClickedCoords,
   PopupComponentName,
 } from '../../types/data';
 import { RootState } from '.';
@@ -9,6 +10,7 @@ import { popupComponentNameList } from '../../data';
 
 export interface PopupState {
   popupComponentAppearances: PopupComponentAppearances;
+  popupComponentLastClickedCoords: PopupComponentLastClickedCoords;
 }
 
 const initialState: PopupState = {
@@ -19,7 +21,6 @@ const initialState: PopupState = {
       width: 0,
       height: 0,
       zIndex: 998,
-      lastClickedCoord: { x: 0, y: 0 },
     },
     close: {
       x: 0,
@@ -27,7 +28,6 @@ const initialState: PopupState = {
       width: 0,
       height: 0,
       zIndex: 999,
-      lastClickedCoord: { x: 0, y: 0 },
     },
     ok: {
       x: 0,
@@ -35,7 +35,31 @@ const initialState: PopupState = {
       width: 0,
       height: 0,
       zIndex: 999,
-      lastClickedCoord: { x: 0, y: 0 },
+    },
+    headerBar: {
+      x: 0,
+      y: 0,
+      width: 0,
+      height: 0,
+      zIndex: 999,
+    },
+  },
+  popupComponentLastClickedCoords: {
+    '': {
+      x: 0,
+      y: 0,
+    },
+    close: {
+      x: 0,
+      y: 0,
+    },
+    ok: {
+      x: 0,
+      y: 0,
+    },
+    headerBar: {
+      x: 0,
+      y: 0,
     },
   },
 };
@@ -56,7 +80,6 @@ export const popupSlice = createSlice({
         };
       }
     ) {
-      console.log('update popup component appearance');
       state.popupComponentAppearances = {
         ...state.popupComponentAppearances,
         ...{
@@ -67,23 +90,35 @@ export const popupSlice = createSlice({
         },
       };
     },
-    updateAllPopupComponentsLastClickedCoord(state) {
-      console.log('update all popup components last clicked coord');
-      state.popupComponentAppearances = {
-        ...state.popupComponentAppearances,
-        ...popupComponentNameList.reduce((result, componentName) => {
-          result[componentName] = {
-            ...state.popupComponentAppearances[componentName],
-            lastClickedCoord: {
-              x: state.popupComponentAppearances[componentName].x,
-              y: state.popupComponentAppearances[componentName].y,
-            },
+    updatePopupComponentLastClickedCoord(
+      state,
+      action: {
+        payload: {
+          componentName: PopupComponentName;
+          coord: {
+            x: number;
+            y: number;
           };
-          return result;
-        }, {} as PopupComponentAppearances),
+        };
+      }
+    ) {
+      state.popupComponentLastClickedCoords = {
+        ...state.popupComponentLastClickedCoords,
+        [action.payload.componentName]: action.payload.coord,
       };
     },
-    deltaUpdatePopupComponentAppearance(
+    updateAllPopupComponentsLastClickedCoord(state) {
+      state.popupComponentLastClickedCoords = {
+        ...popupComponentNameList.reduce((result, componentName) => {
+          result[componentName] = {
+            x: state.popupComponentAppearances[componentName].x,
+            y: state.popupComponentAppearances[componentName].y,
+          };
+          return result;
+        }, {} as PopupComponentLastClickedCoords),
+      };
+    },
+    deltaUpdatePopupComponentCoord(
       state,
       action: {
         payload: {
@@ -93,10 +128,6 @@ export const popupSlice = createSlice({
         };
       }
     ) {
-      console.log('delta update popup component appearance');
-      console.log('deltaX: ' + action.payload.deltaX);
-      console.log('deltaY: ' + action.payload.deltaY);
-
       state.popupComponentAppearances = {
         ...state.popupComponentAppearances,
         ...{
@@ -104,17 +135,19 @@ export const popupSlice = createSlice({
             ...state.popupComponentAppearances[action.payload.componentName],
             ...{
               x:
-                state.popupComponentAppearances[action.payload.componentName]
-                  .lastClickedCoord.x + action.payload.deltaX,
+                state.popupComponentLastClickedCoords[
+                  action.payload.componentName
+                ].x + action.payload.deltaX,
               y:
-                state.popupComponentAppearances[action.payload.componentName]
-                  .lastClickedCoord.y + action.payload.deltaY,
+                state.popupComponentLastClickedCoords[
+                  action.payload.componentName
+                ].y + action.payload.deltaY,
             },
           },
         },
       };
     },
-    deltaUpdateAllPopupComponentAppearances(
+    deltaUpdateAllPopupComponentCoord(
       state,
       action: {
         payload: {
@@ -123,25 +156,22 @@ export const popupSlice = createSlice({
         };
       }
     ) {
-      console.log('delta update all popup component appearances');
-      console.log('deltaX: ' + action.payload.deltaX);
-      console.log('deltaY: ' + action.payload.deltaY);
-
       state.popupComponentAppearances = {
         ...state.popupComponentAppearances,
         ...popupComponentNameList.reduce((result, componentName) => {
           result[componentName] = {
             ...state.popupComponentAppearances[componentName],
             x:
-              state.popupComponentAppearances[componentName].lastClickedCoord
-                .x + action.payload.deltaX,
+              state.popupComponentLastClickedCoords[componentName].x +
+              action.payload.deltaX,
             y:
-              state.popupComponentAppearances[componentName].lastClickedCoord
-                .y + action.payload.deltaY,
+              state.popupComponentLastClickedCoords[componentName].y +
+              action.payload.deltaY,
           };
           return result;
         }, {} as PopupComponentAppearances),
       };
+      console.log(state.popupComponentAppearances);
     },
   },
 });
@@ -150,8 +180,8 @@ export const {
   setPopupComponentAppearances,
   updatePopupComponentAppearance,
   updateAllPopupComponentsLastClickedCoord,
-  deltaUpdatePopupComponentAppearance,
-  deltaUpdateAllPopupComponentAppearances,
+  deltaUpdatePopupComponentCoord,
+  deltaUpdateAllPopupComponentCoord,
 } = popupSlice.actions;
 
 export const selectPopupComponentAppearances = (state: RootState) =>

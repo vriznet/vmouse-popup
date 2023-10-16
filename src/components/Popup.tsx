@@ -17,8 +17,12 @@ import {
 } from '../types/data';
 import useVMouseAction from '../hooks/useVMouseAction';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateScreenComponentVisibility } from '../redux/module/screenSlice';
 import {
+  deltaUpdateScreenComponentCoord,
+  updateScreenComponentVisibility,
+} from '../redux/module/screenSlice';
+import {
+  selectClickedCoord,
   selectCursorX,
   selectCursorY,
   selectMouseActionState,
@@ -30,7 +34,9 @@ import {
   popupComponentNameList,
 } from '../data';
 import {
+  deltaUpdateAllPopupComponentCoord,
   selectPopupComponentAppearances,
+  updateAllPopupComponentsLastClickedCoord,
   updatePopupComponentAppearance,
 } from '../redux/module/popupSlice';
 import PopupCloseButton from './PopupCloseButton';
@@ -104,8 +110,11 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
 
   const mouseActionState = useSelector(selectMouseActionState);
 
+  const clickedCoord = useSelector(selectClickedCoord);
+
   const closeButtonRef = useRef<HTMLDivElement>(null);
   const okButtonRef = useRef<HTMLDivElement>(null);
+  const headerBarRef = useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
 
@@ -178,6 +187,7 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
           })
         );
       }
+
       const okButton = okButtonRef.current;
       if (okButton) {
         const { x, y, width, height } = okButton.getBoundingClientRect();
@@ -194,6 +204,33 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
         dispatch(
           updatePopupComponentAppearance({
             componentName: 'ok',
+            appearance: {
+              x: x - borderLeftWidth,
+              y: y - borderTopWidth,
+              width,
+              height,
+              zIndex,
+            },
+          })
+        );
+      }
+
+      const headerBar = headerBarRef.current;
+      if (headerBar) {
+        const { x, y, width, height } = headerBar.getBoundingClientRect();
+        const computedStyle = window.getComputedStyle(headerBar);
+        const zIndex = parseInt(computedStyle.zIndex || '0', 10);
+        const borderLeftWidth = parseInt(
+          computedStyle.borderLeftWidth || '0',
+          10
+        );
+        const borderTopWidth = parseInt(
+          computedStyle.borderTopWidth || '0',
+          10
+        );
+        dispatch(
+          updatePopupComponentAppearance({
+            componentName: 'headerBar',
             appearance: {
               x: x - borderLeftWidth,
               y: y - borderTopWidth,
@@ -221,6 +258,22 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
     popupComponentAppearances,
     props.isVisible,
     props.isHovered,
+  ]);
+
+  useEffect(() => {
+    if (
+      mouseActionState.isClickStarted === true ||
+      mouseActionState.isClickEnded
+    ) {
+      if (props.isHovered) {
+        dispatch(updateAllPopupComponentsLastClickedCoord());
+      }
+    }
+  }, [
+    mouseActionState.isClickStarted,
+    mouseActionState.isClickEnded,
+    props.isHovered,
+    popupComponentAppearances,
   ]);
 
   useEffect(() => {
@@ -265,6 +318,32 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
     prevHoveredPopupComponentName,
   ]);
 
+  useEffect(() => {
+    if (mouseActionState.isClicking) {
+      if (hoveredPopupComponentName === 'headerBar') {
+        dispatch(
+          deltaUpdateScreenComponentCoord({
+            componentName: 'popup',
+            deltaX: cursorCoordX - clickedCoord.x,
+            deltaY: cursorCoordY - clickedCoord.y,
+          })
+        );
+        dispatch(
+          deltaUpdateAllPopupComponentCoord({
+            deltaX: cursorCoordX - clickedCoord.x,
+            deltaY: cursorCoordY - clickedCoord.y,
+          })
+        );
+      }
+    }
+  }, [
+    mouseActionState.isClicking,
+    hoveredPopupComponentName,
+    cursorCoordX,
+    cursorCoordY,
+    clickedCoord,
+  ]);
+
   return (
     <PopupContainer
       ref={ref}
@@ -272,7 +351,7 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
       $isHovered={props.isHovered}
       $isVisible={props.isVisible}
     >
-      <PopupHeader $isParentHovered={props.isHovered}>
+      <PopupHeader $isParentHovered={props.isHovered} ref={headerBarRef}>
         <PopupTitle>{props.title}</PopupTitle>
         <PopupCloseButton
           ref={closeButtonRef}

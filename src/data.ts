@@ -21,10 +21,16 @@ export const screenComponentNameList: ScreenComponentName[] = [
   'button',
 ];
 
-export const popupComponentNameList: PopupComponentName[] = ['', 'close', 'ok'];
+export const popupComponentNameList: PopupComponentName[] = [
+  '',
+  'close',
+  'ok',
+  'headerBar',
+];
 
 export const initialPopupComponentMouseActionStates = {
   '': initialComponentMouseActionState,
   close: initialComponentMouseActionState,
   ok: initialComponentMouseActionState,
+  headerBar: initialComponentMouseActionState,
 };

@@ -1,15 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
+  Coord,
   PartialScreenComponentAppearance,
   ScreenComponentAppearances,
+  ScreenComponentLastClickedCoords,
   ScreenComponentName,
   ScreenComponentVisibilities,
 } from '../../types/data';
 import { RootState } from '.';
+import { screenComponentNameList } from '../../data';
 
 export interface ScreenState {
   screenComponentAppearances: ScreenComponentAppearances;
   screenComponentVisibilities: ScreenComponentVisibilities;
+  screenComponentLastClickedCoords: ScreenComponentLastClickedCoords;
 }
 
 const initialState: ScreenState = {
@@ -20,7 +24,6 @@ const initialState: ScreenState = {
       width: 320,
       height: 240,
       zIndex: 0,
-      lastClickedCoord: { x: 0, y: 0 },
     },
     popup: {
       x: 0,
@@ -28,7 +31,6 @@ const initialState: ScreenState = {
       width: 160,
       height: 100,
       zIndex: 998,
-      lastClickedCoord: { x: 0, y: 0 },
     },
     modal: {
       x: 0,
@@ -36,7 +38,6 @@ const initialState: ScreenState = {
       width: 160,
       height: 100,
       zIndex: 101,
-      lastClickedCoord: { x: 0, y: 0 },
     },
     button: {
       x: 80,
@@ -44,7 +45,6 @@ const initialState: ScreenState = {
       width: 120,
       height: 100,
       zIndex: 10,
-      lastClickedCoord: { x: 0, y: 0 },
     },
   },
   screenComponentVisibilities: {
@@ -52,6 +52,24 @@ const initialState: ScreenState = {
     popup: false,
     modal: false,
     button: true,
+  },
+  screenComponentLastClickedCoords: {
+    '': {
+      x: 0,
+      y: 0,
+    },
+    popup: {
+      x: 0,
+      y: 0,
+    },
+    modal: {
+      x: 0,
+      y: 0,
+    },
+    button: {
+      x: 0,
+      y: 0,
+    },
   },
 };
 
@@ -71,7 +89,6 @@ export const screenSlice = createSlice({
         };
       }
     ) {
-      console.log('update screen component appearance');
       state.screenComponentAppearances = {
         ...state.screenComponentAppearances,
         ...{
@@ -92,10 +109,6 @@ export const screenSlice = createSlice({
         };
       }
     ) {
-      console.log('delta update screen component coord');
-      console.log('deltaX: ' + action.payload.deltaX);
-      console.log('deltaY: ' + action.payload.deltaY);
-
       state.screenComponentAppearances = {
         ...state.screenComponentAppearances,
         ...{
@@ -103,11 +116,13 @@ export const screenSlice = createSlice({
             ...state.screenComponentAppearances[action.payload.componentName],
             ...{
               x:
-                state.screenComponentAppearances[action.payload.componentName]
-                  .lastClickedCoord.x + action.payload.deltaX,
+                state.screenComponentLastClickedCoords[
+                  action.payload.componentName
+                ].x + action.payload.deltaX,
               y:
-                state.screenComponentAppearances[action.payload.componentName]
-                  .lastClickedCoord.y + action.payload.deltaY,
+                state.screenComponentLastClickedCoords[
+                  action.payload.componentName
+                ].y + action.payload.deltaY,
             },
           },
         },
@@ -122,12 +137,38 @@ export const screenSlice = createSlice({
         };
       }
     ) {
-      console.log('update screen component visibility');
       state.screenComponentVisibilities = {
         ...state.screenComponentVisibilities,
         ...{
           [action.payload.componentName]: action.payload.visibility,
         },
+      };
+    },
+    updateScreenComponentLastClickedCoord(
+      state,
+      action: {
+        payload: {
+          componentName: ScreenComponentName;
+          coord: Coord;
+        };
+      }
+    ) {
+      state.screenComponentLastClickedCoords = {
+        ...state.screenComponentLastClickedCoords,
+        [action.payload.componentName]: action.payload.coord,
+      };
+    },
+    updateAllScreenComponentLastClickedCoords(state) {
+      state.screenComponentLastClickedCoords = {
+        ...state.screenComponentLastClickedCoords,
+        ...screenComponentNameList.reduce((result, componentName) => {
+          result[componentName] = {
+            ...state.screenComponentLastClickedCoords[componentName],
+            x: state.screenComponentAppearances[componentName].x,
+            y: state.screenComponentAppearances[componentName].y,
+          };
+          return result;
+        }, {} as ScreenComponentLastClickedCoords),
       };
     },
   },
@@ -138,11 +179,15 @@ export const {
   updateScreenComponentAppearance,
   deltaUpdateScreenComponentCoord,
   updateScreenComponentVisibility,
+  updateScreenComponentLastClickedCoord,
+  updateAllScreenComponentLastClickedCoords,
 } = screenSlice.actions;
 
 export const selectScreenComponentAppearances = (state: RootState) =>
   state.screen.screenComponentAppearances;
 export const selectScreenComponentVisibilities = (state: RootState) =>
   state.screen.screenComponentVisibilities;
+export const selectScreenComponentLastClickedCoords = (state: RootState) =>
+  state.screen.screenComponentLastClickedCoords;
 
 export default screenSlice.reducer;

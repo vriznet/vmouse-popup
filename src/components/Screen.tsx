@@ -3,17 +3,16 @@ import { styled } from 'styled-components';
 import Cursor from './Cursor';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  selectClickedCoord,
   selectCursorX,
   selectCursorY,
   selectMouseActionState,
 } from '../redux/module/mouseSlice';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
-  deltaUpdateScreenComponentCoord,
   selectScreenComponentAppearances,
   selectScreenComponentVisibilities,
   updateScreenComponentAppearance,
+  updateScreenComponentLastClickedCoord,
   updateScreenComponentVisibility,
 } from '../redux/module/screenSlice';
 import Button from './Button';
@@ -29,10 +28,6 @@ import {
   ScreenComponentName,
 } from '../types/data';
 import Popup from './Popup';
-import {
-  deltaUpdateAllPopupComponentAppearances,
-  updateAllPopupComponentsLastClickedCoord,
-} from '../redux/module/popupSlice';
 
 const Container = styled.div`
   position: relative;
@@ -68,8 +63,6 @@ const Screen = () => {
   const screenComponentVisibilities = useSelector(
     selectScreenComponentVisibilities
   );
-
-  const clickedCoord = useSelector(selectClickedCoord);
 
   const mouseActionState = useSelector(selectMouseActionState);
 
@@ -119,16 +112,19 @@ const Screen = () => {
     const button = buttonRef.current;
     if (button) {
       const { x, y, width, height } = button.getBoundingClientRect();
-      const zIndex = parseInt(
-        window.getComputedStyle(button).zIndex || '0',
+      const computedStyle = window.getComputedStyle(button);
+      const zIndex = parseInt(computedStyle.zIndex || '0', 10);
+      const borderLeftWidth = parseInt(
+        computedStyle.borderLeftWidth || '0',
         10
       );
+      const borderTopWidth = parseInt(computedStyle.borderTopWidth || '0', 10);
       dispatch(
         updateScreenComponentAppearance({
           componentName: 'button',
           appearance: {
-            x,
-            y,
+            x: x - borderLeftWidth,
+            y: y - borderTopWidth,
             width,
             height,
             zIndex,
@@ -149,6 +145,7 @@ const Screen = () => {
         10
       );
       const borderTopWidth = parseInt(computedStyle.borderTopWidth || '0', 10);
+
       dispatch(
         updateScreenComponentAppearance({
           componentName: 'popup',
@@ -205,46 +202,24 @@ const Screen = () => {
   ]);
 
   useEffect(() => {
-    if (mouseActionState.isClickStarted === true) {
+    if (
+      mouseActionState.isClickStarted === true ||
+      mouseActionState.isClickEnded === true
+    ) {
       dispatch(
-        updateScreenComponentAppearance({
+        updateScreenComponentLastClickedCoord({
           componentName: hoveredScreenComponentName,
-          appearance: {
-            lastClickedCoord: {
-              x: screenComponentAppearances[hoveredScreenComponentName].x,
-              y: screenComponentAppearances[hoveredScreenComponentName].y,
-            },
+          coord: {
+            x: screenComponentAppearances[hoveredScreenComponentName].x,
+            y: screenComponentAppearances[hoveredScreenComponentName].y,
           },
         })
       );
-      dispatch(updateAllPopupComponentsLastClickedCoord());
-    }
-  }, [mouseActionState.isClickStarted, hoveredScreenComponentName]);
-
-  useEffect(() => {
-    if (mouseActionState.isClicking) {
-      if (hoveredScreenComponentName === 'popup') {
-        dispatch(
-          deltaUpdateScreenComponentCoord({
-            componentName: 'popup',
-            deltaX: cursorCoordX - clickedCoord.x,
-            deltaY: cursorCoordY - clickedCoord.y,
-          })
-        );
-        dispatch(
-          deltaUpdateAllPopupComponentAppearances({
-            deltaX: cursorCoordX - clickedCoord.x,
-            deltaY: cursorCoordY - clickedCoord.y,
-          })
-        );
-      }
     }
   }, [
-    mouseActionState.isClicking,
+    mouseActionState.isClickStarted,
+    mouseActionState.isClickEnded,
     hoveredScreenComponentName,
-    cursorCoordX,
-    cursorCoordY,
-    clickedCoord,
   ]);
 
   return (

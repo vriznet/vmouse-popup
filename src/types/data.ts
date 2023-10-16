@@ -11,7 +11,6 @@ export type Appearance = {
   width: number;
   height: number;
   zIndex: number;
-  lastClickedCoord: Coord;
 };
 
 export type ScreenComponentName = '' | 'popup' | 'modal' | 'button';
@@ -28,11 +27,15 @@ export type PartialScreenComponentAppearance = Partial<
   Record<keyof Appearance, any>
 >;
 
+export type ScreenComponentLastClickedCoords = {
+  [componentName in ScreenComponentName]: Coord;
+};
+
 export type ActionMap = {
   [key in keyof ComponentMouseActionState]: () => void;
 };
 
-export type PopupComponentName = '' | 'close' | 'ok';
+export type PopupComponentName = '' | 'close' | 'ok' | 'headerBar';
 
 export type PopupComponentAppearances = {
   [componentName in PopupComponentName]: Appearance;
@@ -41,3 +44,7 @@ export type PopupComponentAppearances = {
 export type PartialPopupComponentAppearance = Partial<
   Record<keyof Appearance, any>
 >;
+
+export type PopupComponentLastClickedCoords = {
+  [componentName in PopupComponentName]: Coord;
+};

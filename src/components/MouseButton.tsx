@@ -40,6 +40,7 @@ const MouseButton = () => {
       dispatch(
         updateMouseActionState({
           isClickStarted: true,
+          isClickEnded: false,
           isClicking: true,
           isLongClickStarted: false,
         })
@@ -66,7 +67,9 @@ const MouseButton = () => {
     (event: TouchEvent) => {
       event.preventDefault();
 
-      dispatch(updateMouseActionState({ isClicking: false }));
+      dispatch(
+        updateMouseActionState({ isClicking: false, isClickEnded: true })
+      );
 
       clearTimeout(longTouchTimeoutId);
       clearTimeout(doubleTouchTimeoutId);
@@ -147,6 +150,15 @@ const MouseButton = () => {
         dispatch(
           updateMouseActionState({
             isClickStarted: false,
+          })
+        );
+      }, 1);
+    }
+    if (mouseActionState.isClickEnded) {
+      setTimeout(() => {
+        dispatch(
+          updateMouseActionState({
+            isClickEnded: false,
           })
         );
       }, 1);

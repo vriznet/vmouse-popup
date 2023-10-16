@@ -3,6 +3,7 @@ import { PopupComponentName, ScreenComponentName } from './data';
 export type MouseActionState = {
   isClicking: boolean;
   isClickStarted: boolean;
+  isClickEnded: boolean;
   isShortClicked: boolean;
   isDblClicked: boolean;
   isLongClickStarted: boolean;
