@@ -52,16 +52,19 @@ interface IPopupHeaderProps {
   $isParentHovered: boolean;
 }
 
-const PopupContainer = styled.div<IPopupContainerProps>`
+const PopupContainer = styled.div.attrs<IPopupContainerProps>((props) => ({
+  style: {
+    top: `${props.$coord.y}px`,
+    left: `${props.$coord.x}px`,
+    display: props.$isVisible ? 'flex' : 'none',
+  },
+}))<IPopupContainerProps>`
   position: absolute;
-  top: ${(props) => props.$coord.y}px;
-  left: ${(props) => props.$coord.x}px;
   width: 240px;
   border: 1px solid #000;
   z-index: 998;
   color: ${(props) => (props.$isHovered ? '#fff' : '#000')};
   background-color: ${(props) => (props.$isHovered ? '#000' : '#fff')};
-  display: ${(props) => (props.$isVisible ? 'flex' : 'none')};
   flex-direction: column;
   padding-bottom: 16px;
   justify-content: flex-start;

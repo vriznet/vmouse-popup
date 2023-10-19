@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect } from 'react';
 import { ComponentMouseActionState } from '../types/states';
 import { ActionMap } from '../types/data';

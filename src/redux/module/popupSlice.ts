@@ -171,7 +171,6 @@ export const popupSlice = createSlice({
           return result;
         }, {} as PopupComponentAppearances),
       };
-      console.log(state.popupComponentAppearances);
     },
   },
 });
