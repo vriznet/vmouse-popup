@@ -1,15 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// #region : imports
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { styled } from 'styled-components';
 import { setCursorCoordX, setCursorCoordY } from '../redux/module/mouseSlice';
+import { inrange } from '../utils';
+// #endregion : imports
 
+// #region : styled components
 const TrackpadSC = styled.div`
   width: 320px;
   height: 240px;
   border: 1px solid #000;
 `;
+// #endregion : styled components
 
+// #region : functions
 const copyTouch = ({ identifier, pageX, pageY }: any) => ({
   identifier,
   pageX,
@@ -27,22 +33,22 @@ const ongoingTouchIndexById = (ongoingTouches: any[], idToFind: number) => {
 
   return -1;
 };
-
-export const inrange = (v: number, min: number, max: number) => {
-  if (v < min) return min;
-  if (v > max) return max;
-  return v;
-};
+// #endregion : functions
 
 const Trackpad = () => {
-  const trackpadRef = useRef<HTMLDivElement>(null);
-
+  // #region : states
   const [ongoingTouches, setOngoingTouches] = useState<any[]>([]);
   const [currentCursorCoordX, setCurrentCursorCoordX] = useState<number>(0);
   const [currentCursorCoordY, setCurrentCursorCoordY] = useState<number>(0);
+  // #endregion : states
 
   const dispatch = useDispatch();
 
+  // #region : refs
+  const trackpadRef = useRef<HTMLDivElement>(null);
+  // #endregion : refs
+
+  // #region : handlers
   const handlePadTouchStart = useCallback(
     (event: TouchEvent) => {
       event.preventDefault();
@@ -119,7 +125,10 @@ const Trackpad = () => {
     },
     [ongoingTouches, setOngoingTouches]
   );
+  // #endregion : handlers
 
+  // #region : effects
+  // #region :: add event listeners - ongoingTouches dependency
   useEffect(() => {
     const trackpad = trackpadRef.current;
 
@@ -137,7 +146,9 @@ const Trackpad = () => {
       }
     };
   }, [ongoingTouches, setOngoingTouches]);
+  // #endregion :: add event listeners - ongoingTouches dependency
 
+  // #region :: update cursor coord x, y
   useEffect(() => {
     dispatch(setCursorCoordX(currentCursorCoordX));
   }, [currentCursorCoordX]);
@@ -145,6 +156,8 @@ const Trackpad = () => {
   useEffect(() => {
     dispatch(setCursorCoordY(currentCursorCoordY));
   }, [currentCursorCoordY]);
+  // #endregion :: update cursor coord x, y
+  // #endregion : effects
 
   return <TrackpadSC id="trackpad" ref={trackpadRef} />;
 };

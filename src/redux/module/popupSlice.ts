@@ -1,3 +1,4 @@
+// #region : imports
 import { createSlice } from '@reduxjs/toolkit';
 import {
   PartialPopupComponentAppearance,
@@ -7,12 +8,16 @@ import {
 } from '../../types/data';
 import { RootState } from '.';
 import { popupComponentNameList } from '../../data';
+// #endregion : imports
 
+// #region : types
 export interface PopupState {
   popupComponentAppearances: PopupComponentAppearances;
   popupComponentLastClickedCoords: PopupComponentLastClickedCoords;
 }
+// #endregion : types
 
+// #region : initialState
 const initialState: PopupState = {
   popupComponentAppearances: {
     '': {
@@ -63,7 +68,9 @@ const initialState: PopupState = {
     },
   },
 };
+// #endregion : initialState
 
+// #region : reducers
 export const popupSlice = createSlice({
   name: 'popup',
   initialState,
@@ -174,7 +181,10 @@ export const popupSlice = createSlice({
     },
   },
 });
+// #endregion : reducers
 
+// #region : exports
+// #region :: exporting actions
 export const {
   setPopupComponentAppearances,
   updatePopupComponentAppearance,
@@ -182,8 +192,12 @@ export const {
   deltaUpdatePopupComponentCoord,
   deltaUpdateAllPopupComponentCoord,
 } = popupSlice.actions;
+// #endregion :: exporting actions
 
+// #region :: exporting selectors
 export const selectPopupComponentAppearances = (state: RootState) =>
   state.popup.popupComponentAppearances;
+// #endregion :: exporting selectors
 
 export default popupSlice.reducer;
+// #endregion : exports

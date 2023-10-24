@@ -1,3 +1,4 @@
+// #region : imports
 import { forwardRef, memo } from 'react';
 import styled from 'styled-components';
 import { IPopupOkButtonProps } from '../types/props';
@@ -5,11 +6,15 @@ import { useDispatch } from 'react-redux';
 import { ActionMap } from '../types/data';
 import { updateScreenComponentVisibility } from '../redux/module/screenSlice';
 import useVMouseAction from '../hooks/useVMouseAction';
+// #endregion : imports
 
+// #region : types
 interface IPopupOkButtonSCProps {
   $isHovered: boolean;
 }
+// #endregion : types
 
+// #region : styled components
 const PopupOkButtonSC = styled.div<IPopupOkButtonSCProps>`
   display: flex;
   justify-content: center;
@@ -20,11 +25,13 @@ const PopupOkButtonSC = styled.div<IPopupOkButtonSCProps>`
   width: fit-content;
   padding: 4px 8px;
 `;
+// #endregion : styled components
 
 const PopupOkButton = forwardRef<HTMLDivElement, IPopupOkButtonProps>(
   (props, ref) => {
     const dispatch = useDispatch();
 
+    // #region : action map
     const actionMap: ActionMap = {
       isShortClicked() {
         dispatch(
@@ -39,6 +46,7 @@ const PopupOkButton = forwardRef<HTMLDivElement, IPopupOkButtonProps>(
       isLongClickStarted() {},
       isLongClickEnded() {},
     };
+    // #endregion : action map
 
     useVMouseAction(props.mouseActionState, actionMap);
 

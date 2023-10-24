@@ -1,15 +1,20 @@
+// #region : imports
 import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '.';
 import { Coord } from '../../types/data';
 import { MouseActionState } from '../../types/states';
+// #endregion : imports
 
+// #region : types
 export interface MouseState {
   cursorX: number;
   cursorY: number;
   clickedCoord: Coord;
   mouseActionState: MouseActionState;
 }
+// #endregion : types
 
+// #region : initialState
 const initialState: MouseState = {
   cursorX: 10,
   cursorY: 10,
@@ -24,7 +29,9 @@ const initialState: MouseState = {
     isLongClickEnded: false,
   },
 };
+// #endregion : initialState
 
+// #region : reducers
 export const mouseSlice = createSlice({
   name: 'mouse',
   initialState,
@@ -52,7 +59,10 @@ export const mouseSlice = createSlice({
     },
   },
 });
+// #endregion : reducers
 
+// #region : exports
+// #region :: exporting actions
 export const {
   setCursorCoordX,
   setCursorCoordY,
@@ -60,12 +70,16 @@ export const {
   setMouseActionState,
   updateMouseActionState,
 } = mouseSlice.actions;
+// #endregion :: exporting actions
 
+// #region :: exporting selectors
 export const selectCursorX = (state: RootState) => state.mouse.cursorX;
 export const selectCursorY = (state: RootState) => state.mouse.cursorY;
 export const selectClickedCoord = (state: RootState) =>
   state.mouse.clickedCoord;
 export const selectMouseActionState = (state: RootState) =>
   state.mouse.mouseActionState;
+// #endregion :: exporting selectors
 
 export default mouseSlice.reducer;
+// #endregion : exports

@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// #region : imports
 import { styled } from 'styled-components';
 import Cursor from './Cursor';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,7 +29,9 @@ import {
   ScreenComponentName,
 } from '../types/data';
 import Popup from './Popup';
+// #endregion : imports
 
+// #region : styled components
 const Container = styled.div`
   position: relative;
   display: flex;
@@ -39,8 +42,10 @@ const Container = styled.div`
   border: 1px solid #000;
   z-index: 999;
 `;
+// #endregion : styled components
 
 const Screen = () => {
+  // #region : states
   const [
     screenComponentMouseActionStates,
     setScreenComponentMouseActionStates,
@@ -52,25 +57,29 @@ const Screen = () => {
     useState<ScreenComponentName>('');
   const [prevHoveredScreenComponentName, setPrevHoveredScreenComponentName] =
     useState<ScreenComponentName>('');
+  // #endregion : states
+
+  // #region : redux
+  const dispatch = useDispatch();
 
   const cursorCoordX = useSelector(selectCursorX);
   const cursorCoordY = useSelector(selectCursorY);
-
   const screenComponentAppearances = useSelector(
     selectScreenComponentAppearances
   );
-
   const screenComponentVisibilities = useSelector(
     selectScreenComponentVisibilities
   );
-
   const mouseActionState = useSelector(selectMouseActionState);
+  // #endregion : redux
 
+  // #region : refs
+  const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
+  // #endregion : refs
 
-  const dispatch = useDispatch();
-
+  // #region : getScreenComponentNameFromPoint
   const getScreenComponentNameFromPoint = useCallback(
     (point: Coord): ScreenComponentName => {
       const screenComponentNameAndVisibilityAndZIndexes: {
@@ -107,7 +116,10 @@ const Screen = () => {
     },
     [screenComponentAppearances, screenComponentVisibilities]
   );
+  // #endregion : getScreenComponentNameFromPoint
 
+  // #region : effects
+  // #region :: did mount effect
   useEffect(() => {
     const button = buttonRef.current;
     if (button) {
@@ -133,7 +145,9 @@ const Screen = () => {
       );
     }
   }, []);
+  // #endregion :: did mount effect
 
+  // #region :: screen's component - popup visibility update effect
   useEffect(() => {
     const popup = popupRef.current;
     if (popup && screenComponentVisibilities.popup) {
@@ -160,7 +174,9 @@ const Screen = () => {
       );
     }
   }, [screenComponentVisibilities.popup]);
+  // #endregion :: screen's component - popup visibility update effect
 
+  // #region :: setting hoveredScreenComponentName
   useEffect(() => {
     const hoveredComponentName = getScreenComponentNameFromPoint({
       x: cursorCoordX,
@@ -173,7 +189,9 @@ const Screen = () => {
     screenComponentAppearances,
     screenComponentVisibilities,
   ]);
+  // #endregion :: setting hoveredScreenComponentName
 
+  // #region :: setting screenComponentMouseActionStates
   useEffect(() => {
     setScreenComponentMouseActionStates((prev) => ({
       ...prev,
@@ -200,7 +218,9 @@ const Screen = () => {
     mouseActionState,
     prevHoveredScreenComponentName,
   ]);
+  // #endregion :: setting screenComponentMouseActionStates
 
+  // #region :: updating screen components' last clicked coord
   useEffect(() => {
     if (
       mouseActionState.isClickStarted === true ||
@@ -221,9 +241,11 @@ const Screen = () => {
     mouseActionState.isClickEnded,
     hoveredScreenComponentName,
   ]);
+  // #endregion :: updating screen components' last clicked coord
+  // #endregion : effects
 
   return (
-    <Container>
+    <Container ref={containerRef}>
       <Cursor x={cursorCoordX} y={cursorCoordY} />
       <Button
         ref={buttonRef}
@@ -258,6 +280,7 @@ const Screen = () => {
           x: screenComponentAppearances.popup.x,
           y: screenComponentAppearances.popup.y,
         }}
+        screenContainerRef={containerRef}
       />
     </Container>
   );

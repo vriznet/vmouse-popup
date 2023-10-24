@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+// #region : imports
 import { useDispatch, useSelector } from 'react-redux';
 import { styled } from 'styled-components';
 import {
@@ -9,14 +10,18 @@ import {
   updateMouseActionState,
 } from '../redux/module/mouseSlice';
 import { memo, useCallback, useEffect, useState } from 'react';
+// #endregion : imports
 
+// #region : styled components
 const MouseButtonSC = styled.div`
   width: 100%;
   height: 40px;
   border: 1px solid #000;
 `;
+// #endregion : styled components
 
 const MouseButton = () => {
+  // #region : states
   const [longTouchTimeoutId, setLongTouchTimeoutId] = useState<
     NodeJS.Timeout | undefined
   >(undefined);
@@ -25,14 +30,18 @@ const MouseButton = () => {
   >(undefined);
   const [isInDoubleClickInterval, setIsInDoubleClickInterval] =
     useState<boolean>(false);
+  // #endregion : states
 
+  // #region : redux
   const dispatch = useDispatch();
 
   const cursorX = useSelector(selectCursorX);
   const cursorY = useSelector(selectCursorY);
 
   const mouseActionState = useSelector(selectMouseActionState);
+  // #endregion : redux
 
+  // #region : handlers
   const handleMouseButtonTouchStart = useCallback(
     (event: TouchEvent) => {
       event.preventDefault();
@@ -121,14 +130,19 @@ const MouseButton = () => {
       isInDoubleClickInterval,
     ]
   );
+  // #endregion : handlers
 
+  // #region : effects
+  // #region :: did mount effect
   useEffect(() => {
     return () => {
       clearTimeout(longTouchTimeoutId);
       clearTimeout(doubleTouchTimeoutId);
     };
   }, []);
+  // #endregion :: did mount effect
 
+  // #region :: handleMouseButtonTouchStart, handleMouseButtonTouchEnd effect
   useEffect(() => {
     const mouseBtn = document.getElementById('mouse-btn');
     if (mouseBtn) {
@@ -143,7 +157,9 @@ const MouseButton = () => {
       }
     };
   }, [handleMouseButtonTouchStart, handleMouseButtonTouchEnd]);
+  // #endregion :: handleMouseButtonTouchStart, handleMouseButtonTouchEnd effect
 
+  // #region :: mouseActionState effect
   useEffect(() => {
     if (mouseActionState.isClickStarted) {
       setTimeout(() => {
@@ -191,6 +207,8 @@ const MouseButton = () => {
       }, 1);
     }
   }, [mouseActionState]);
+  // #endregion :: mouseActionState effect
+  // #endregion : effects
 
   return <MouseButtonSC id="mouse-btn" />;
 };

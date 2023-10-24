@@ -18,6 +18,7 @@ export interface IPopupProps {
   title: string;
   content: string;
   coord: Coord;
+  screenContainerRef: React.RefObject<HTMLDivElement>;
 }
 
 export interface IPopupCloseButtonProps {

@@ -1,5 +1,8 @@
+// #region : imports
 import { ComponentMouseActionState } from './states';
+// #endregion : imports
 
+// #region : common
 export type Coord = {
   x: number;
   y: number;
@@ -13,6 +16,12 @@ export type Appearance = {
   zIndex: number;
 };
 
+export type ActionMap = {
+  [key in keyof ComponentMouseActionState]: () => void;
+};
+// #endregion : common
+
+// #region : screen component
 export type ScreenComponentName = '' | 'popup' | 'modal' | 'button';
 
 export type ScreenComponentAppearances = {
@@ -30,11 +39,9 @@ export type PartialScreenComponentAppearance = Partial<
 export type ScreenComponentLastClickedCoords = {
   [componentName in ScreenComponentName]: Coord;
 };
+// #endregion : screen component
 
-export type ActionMap = {
-  [key in keyof ComponentMouseActionState]: () => void;
-};
-
+// #region : popup component
 export type PopupComponentName = '' | 'close' | 'ok' | 'headerBar';
 
 export type PopupComponentAppearances = {
@@ -48,3 +55,4 @@ export type PartialPopupComponentAppearance = Partial<
 export type PopupComponentLastClickedCoords = {
   [componentName in PopupComponentName]: Coord;
 };
+// #endregion : popup component
