@@ -38,7 +38,8 @@ import {
 } from '../data';
 import {
   selectPopupComponentAppearances,
-  updateAllPopupComponentsLastClickedCoord,
+  selectPopupComponentLastClickedComponentName,
+  setPopupComponentLastClickedComponentName,
   updatePopupComponentAppearance,
 } from '../redux/module/popupSlice';
 import PopupCloseButton from './PopupCloseButton';
@@ -79,7 +80,7 @@ const PopupContainer = styled.div.attrs<IPopupContainerProps>((props) => ({
 `;
 
 const PopupHeader = styled.header<IPopupHeaderProps>`
-  height: 40px;
+  height: 16px;
   line-height: 16px;
   border-bottom: 1px solid
     ${(props) => (props.$isParentHovered ? '#fff' : '#000')};
@@ -124,6 +125,9 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   );
   const mouseActionState = useSelector(selectMouseActionState);
   const clickedCoord = useSelector(selectClickedCoord);
+  const clickedComponentName = useSelector(
+    selectPopupComponentLastClickedComponentName
+  );
   // #endregion : redux
 
   // #region : refs
@@ -258,23 +262,25 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   ]);
   // #endregion :: setting hoveredComponentName - cursorCoordX, cursorCoordY, popupComponentAppearances, props.isVisible, props.isHovered dependency
 
-  // #region :: updating all PopupComponentsLastClickedCoord - mouseActionState.isClickStarted, mouseActionState.isClickEnded, props.isHovered, popupComponentAppearances dependency
+  // #region :: mouseActionState.isClickStarted, mouseActionState.isClickEnded, props.isHovered, hoveredPopupComponentName dependency
   useEffect(() => {
-    if (
-      mouseActionState.isClickStarted === true ||
-      mouseActionState.isClickEnded
-    ) {
-      if (props.isHovered) {
-        dispatch(updateAllPopupComponentsLastClickedCoord());
+    if (props.isHovered) {
+      if (mouseActionState.isClickStarted === true) {
+        dispatch(
+          setPopupComponentLastClickedComponentName(hoveredPopupComponentName)
+        );
+      }
+      if (mouseActionState.isClickEnded === true) {
+        dispatch(setPopupComponentLastClickedComponentName(''));
       }
     }
   }, [
     mouseActionState.isClickStarted,
     mouseActionState.isClickEnded,
     props.isHovered,
-    popupComponentAppearances,
+    hoveredPopupComponentName,
   ]);
-  // #endregion :: updateAllPopupComponentsLastClickedCoord - mouseActionState.isClickStarted, mouseActionState.isClickEnded, props.isHovered, popupComponentAppearances dependency
+  // #endregion :: mouseActionState.isClickStarted, mouseActionState.isClickEnded, props.isHovered, hoveredPopupComponentName dependency
 
   // #region :: updating popup component visibility & prevHoveredPopupComponentName & popupComponentMouseActionStates - hoveredPopupComponentName, mouseActionState, prevHoveredPopupComponentName dependency
   useEffect(() => {
@@ -324,7 +330,7 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   useEffect(() => {
     if (mouseActionState.isClicking) {
       if (
-        hoveredPopupComponentName === 'headerBar' &&
+        clickedComponentName === 'headerBar' &&
         popupContainerRef?.current &&
         props.screenContainerRef?.current
       ) {

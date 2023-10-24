@@ -18,6 +18,7 @@ export interface ScreenState {
   screenComponentAppearances: ScreenComponentAppearances;
   screenComponentVisibilities: ScreenComponentVisibilities;
   screenComponentLastClickedCoords: ScreenComponentLastClickedCoords;
+  screenComponentLastClickedComponentName: ScreenComponentName;
 }
 // #endregion : types
 
@@ -77,6 +78,7 @@ const initialState: ScreenState = {
       y: 0,
     },
   },
+  screenComponentLastClickedComponentName: '',
 };
 // #endregion : initialState
 
@@ -224,6 +226,14 @@ export const screenSlice = createSlice({
         }, {} as ScreenComponentLastClickedCoords),
       };
     },
+    setScreenComponentLastClickedComponentName(
+      state,
+      action: {
+        payload: ScreenComponentName;
+      }
+    ) {
+      state.screenComponentLastClickedComponentName = action.payload;
+    },
   },
 });
 // #endregion : reducers
@@ -237,6 +247,7 @@ export const {
   updateScreenComponentVisibility,
   updateScreenComponentLastClickedCoord,
   updateAllScreenComponentLastClickedCoords,
+  setScreenComponentLastClickedComponentName,
 } = screenSlice.actions;
 // #endregion : exporting actions
 
@@ -247,6 +258,9 @@ export const selectScreenComponentVisibilities = (state: RootState) =>
   state.screen.screenComponentVisibilities;
 export const selectScreenComponentLastClickedCoords = (state: RootState) =>
   state.screen.screenComponentLastClickedCoords;
+export const selectScreenComponentLastClickedComponentName = (
+  state: RootState
+) => state.screen.screenComponentLastClickedComponentName;
 // #endregion : exporting selectors
 
 export default screenSlice.reducer;

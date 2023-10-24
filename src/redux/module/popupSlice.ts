@@ -14,6 +14,7 @@ import { popupComponentNameList } from '../../data';
 export interface PopupState {
   popupComponentAppearances: PopupComponentAppearances;
   popupComponentLastClickedCoords: PopupComponentLastClickedCoords;
+  popupComponentLastClickedComponentName: PopupComponentName;
 }
 // #endregion : types
 
@@ -67,6 +68,7 @@ const initialState: PopupState = {
       y: 0,
     },
   },
+  popupComponentLastClickedComponentName: '',
 };
 // #endregion : initialState
 
@@ -179,6 +181,14 @@ export const popupSlice = createSlice({
         }, {} as PopupComponentAppearances),
       };
     },
+    setPopupComponentLastClickedComponentName(
+      state,
+      action: {
+        payload: PopupComponentName;
+      }
+    ) {
+      state.popupComponentLastClickedComponentName = action.payload;
+    },
   },
 });
 // #endregion : reducers
@@ -191,12 +201,18 @@ export const {
   updateAllPopupComponentsLastClickedCoord,
   deltaUpdatePopupComponentCoord,
   deltaUpdateAllPopupComponentCoord,
+  setPopupComponentLastClickedComponentName,
 } = popupSlice.actions;
 // #endregion :: exporting actions
 
 // #region :: exporting selectors
 export const selectPopupComponentAppearances = (state: RootState) =>
   state.popup.popupComponentAppearances;
+export const selectPopupComponentLastClickedCoords = (state: RootState) =>
+  state.popup.popupComponentLastClickedCoords;
+export const selectPopupComponentLastClickedComponentName = (
+  state: RootState
+) => state.popup.popupComponentLastClickedComponentName;
 // #endregion :: exporting selectors
 
 export default popupSlice.reducer;

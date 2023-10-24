@@ -12,6 +12,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   selectScreenComponentAppearances,
   selectScreenComponentVisibilities,
+  setScreenComponentLastClickedComponentName,
   updateScreenComponentAppearance,
   updateScreenComponentLastClickedCoord,
   updateScreenComponentVisibility,
@@ -220,12 +221,9 @@ const Screen = () => {
   ]);
   // #endregion :: setting screenComponentMouseActionStates
 
-  // #region :: updating screen components' last clicked coord
+  // #region :: mouseActionState.isClickStarted, mouseActionState.isClickEnded, hoveredScreenComponentName dependency effect
   useEffect(() => {
-    if (
-      mouseActionState.isClickStarted === true ||
-      mouseActionState.isClickEnded === true
-    ) {
+    if (mouseActionState.isClickStarted === true) {
       dispatch(
         updateScreenComponentLastClickedCoord({
           componentName: hoveredScreenComponentName,
@@ -235,13 +233,28 @@ const Screen = () => {
           },
         })
       );
+      dispatch(
+        setScreenComponentLastClickedComponentName(hoveredScreenComponentName)
+      );
+    }
+    if (mouseActionState.isClickEnded) {
+      dispatch(
+        updateScreenComponentLastClickedCoord({
+          componentName: hoveredScreenComponentName,
+          coord: {
+            x: screenComponentAppearances[hoveredScreenComponentName].x,
+            y: screenComponentAppearances[hoveredScreenComponentName].y,
+          },
+        })
+      );
+      dispatch(setScreenComponentLastClickedComponentName(''));
     }
   }, [
     mouseActionState.isClickStarted,
     mouseActionState.isClickEnded,
     hoveredScreenComponentName,
   ]);
-  // #endregion :: updating screen components' last clicked coord
+  // #endregion :: mouseActionState.isClickStarted, mouseActionState.isClickEnded, hoveredScreenComponentName dependency effect
   // #endregion : effects
 
   return (
