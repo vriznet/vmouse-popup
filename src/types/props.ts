@@ -36,14 +36,13 @@ export interface IPopupOkButtonProps {
 
 export interface IDismissableContainerProps {
   children: React.ReactNode;
-  mouseActionState: ComponentMouseActionState;
   parentComponentName: ScreenComponentName;
-  padding: number;
-  border: string;
-  $width: number;
-  $height: number;
+  $padding: number;
+  $border: string;
   $isHovered: boolean;
   $isVisible: boolean;
   $coord: Coord;
-  backgroundColor?: string;
+  $width?: number;
+  $height?: number;
+  $backgroundColor?: string;
 }

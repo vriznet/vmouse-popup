@@ -3,21 +3,22 @@
 import styled from 'styled-components';
 import { Coord } from '../types/data';
 import { IDismissableContainerProps } from '../types/props';
-import { forwardRef, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { forwardRef, memo, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateScreenComponentVisibility } from '../redux/module/screenSlice';
+import { selectMouseActionState } from '../redux/module/mouseSlice';
 // #endregion : imports
 
 // #region : types
 interface IContainerSCProps {
-  padding: number;
-  border: string;
-  $width: number;
-  $height: number;
+  $padding: number;
+  $border: string;
   $isHovered: boolean;
   $isVisible: boolean;
   $coord: Coord;
-  backgroundColor?: string;
+  $width?: number;
+  $height?: number;
+  $backgroundColor?: string;
 }
 // #endregion : types
 
@@ -27,16 +28,16 @@ const ContainerSC = styled.div.attrs<IContainerSCProps>((props) => ({
     left: `${props.$coord.x}px`,
     top: `${props.$coord.y}px`,
     display: props.$isVisible ? 'flex' : 'none',
-    width: `${props.$width}px`,
-    height: `${props.$height}px`,
+    width: `${props.$width ? props.$width : 'auto'}`,
+    height: `${props.$height ? props.$height : 'auto'}`,
   },
 }))<IContainerSCProps>`
   position: absolute;
-  z-index: 999;
-  padding: ${(props) => props.padding}px;
-  border: ${(props) => props.border};
+  z-index: 900;
+  padding: ${(props) => props.$padding}px;
+  border: ${(props) => props.$border};
   background-color: ${(props) =>
-    props.backgroundColor ? props.backgroundColor : '#fff'};
+    props.$backgroundColor ? props.$backgroundColor : '#fff'};
   flex-direction: column;
   justify-content: center;
   align-items: center;
@@ -49,11 +50,13 @@ const DismissableContainer = forwardRef<
 >((props, ref) => {
   const dispatch = useDispatch();
 
+  const mouseActionState = useSelector(selectMouseActionState);
+
   useEffect(() => {
     if (
-      (props.mouseActionState.isShortClicked ||
-        props.mouseActionState.isLongClickEnded ||
-        props.mouseActionState.isDblClicked) &&
+      (mouseActionState.isShortClicked ||
+        mouseActionState.isLongClickEnded ||
+        mouseActionState.isDblClicked) &&
       !props.$isHovered
     ) {
       dispatch(
@@ -65,22 +68,22 @@ const DismissableContainer = forwardRef<
     }
   }, [
     props.$isHovered,
-    props.mouseActionState.isDblClicked,
-    props.mouseActionState.isLongClickEnded,
-    props.mouseActionState.isShortClicked,
+    mouseActionState.isDblClicked,
+    mouseActionState.isLongClickEnded,
+    mouseActionState.isShortClicked,
     props.parentComponentName,
   ]);
 
   return (
     <ContainerSC
-      padding={props.padding}
-      border={props.border}
+      $padding={props.$padding}
+      $border={props.$border}
       $width={props.$width}
       $height={props.$height}
       $isHovered={props.$isHovered}
       $isVisible={props.$isVisible}
       $coord={props.$coord}
-      backgroundColor={props.backgroundColor}
+      $backgroundColor={props.$backgroundColor}
       ref={ref}
     >
       {props.children}
@@ -88,4 +91,4 @@ const DismissableContainer = forwardRef<
   );
 });
 
-export default DismissableContainer;
+export default memo(DismissableContainer);

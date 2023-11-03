@@ -20,10 +20,7 @@ import {
 } from '../types/data';
 import useVMouseAction from '../hooks/useVMouseAction';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  deltaUpdateScreenComponentCoord,
-  updateScreenComponentVisibility,
-} from '../redux/module/screenSlice';
+import { deltaUpdateScreenComponentCoord } from '../redux/module/screenSlice';
 import {
   selectClickedCoord,
   selectCursorX,
@@ -45,45 +42,14 @@ import {
 import PopupCloseButton from './PopupCloseButton';
 import PopupOkButton from './PopupOkButton';
 import { BOUNDARY_MARGIN } from '../constants';
+import DismissableContainer from './DismissableContainer';
 // #endregion : imports
 
-// #region : types
-interface IPopupContainerProps {
-  $isHovered: boolean;
-  $isVisible: boolean;
-  $coord: Coord;
-}
-
-interface IPopupHeaderProps {
-  $isParentHovered: boolean;
-}
-// #endregion : types
-
 // #region : styled components
-const PopupContainer = styled.div.attrs<IPopupContainerProps>((props) => ({
-  style: {
-    top: `${props.$coord.y}px`,
-    left: `${props.$coord.x}px`,
-    display: props.$isVisible ? 'flex' : 'none',
-  },
-}))<IPopupContainerProps>`
-  position: absolute;
-  width: 240px;
-  border: 1px solid #000;
-  z-index: 998;
-  color: ${(props) => (props.$isHovered ? '#fff' : '#000')};
-  background-color: ${(props) => (props.$isHovered ? '#000' : '#fff')};
-  flex-direction: column;
-  padding-bottom: 16px;
-  justify-content: flex-start;
-  align-items: center;
-`;
-
-const PopupHeader = styled.header<IPopupHeaderProps>`
+const PopupHeader = styled.header`
   height: 16px;
   line-height: 16px;
-  border-bottom: 1px solid
-    ${(props) => (props.$isParentHovered ? '#fff' : '#000')};
+  border-bottom: 1px solid #000;
   font-size: 11px;
   width: 100%;
   display: flex;
@@ -93,9 +59,16 @@ const PopupHeader = styled.header<IPopupHeaderProps>`
 
 const PopupTitle = styled.h1``;
 
+const PopupBody = styled.div`
+  padding: 16px 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+`;
+
 const PopupContent = styled.div`
-  padding: 24px 0 16px 0;
-  height: 24px;
   width: 100%;
   display: flex;
   justify-content: center;
@@ -282,23 +255,8 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   ]);
   // #endregion :: mouseActionState.isClickStarted, mouseActionState.isClickEnded, props.isHovered, hoveredPopupComponentName dependency
 
-  // #region :: updating popup component visibility & prevHoveredPopupComponentName & popupComponentMouseActionStates - hoveredPopupComponentName, mouseActionState, prevHoveredPopupComponentName dependency
+  // #region :: updating prevHoveredPopupComponentName & popupComponentMouseActionStates - hoveredPopupComponentName, mouseActionState, prevHoveredPopupComponentName dependency
   useEffect(() => {
-    if (
-      (mouseActionState.isShortClicked ||
-        mouseActionState.isLongClickEnded ||
-        mouseActionState.isDblClicked) &&
-      !props.isHovered
-    ) {
-      dispatch(
-        updateScreenComponentVisibility({
-          componentName: 'popup',
-          visibility: false,
-        })
-      );
-      setHoveredPopupComponentName('');
-    }
-
     setPopupComponentMouseActionStates((prev) => ({
       ...prev,
       ...popupComponentNameList.reduce((acc, name) => {
@@ -324,7 +282,7 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
     mouseActionState,
     prevHoveredPopupComponentName,
   ]);
-  // #endregion :: updating popup component visibility & prevHoveredPopupComponentName & popupComponentMouseActionStates - hoveredPopupComponentName, mouseActionState, prevHoveredPopupComponentName dependency
+  // #endregion :: updating prevHoveredPopupComponentName & popupComponentMouseActionStates - hoveredPopupComponentName, mouseActionState, prevHoveredPopupComponentName dependency
 
   // #region :: dragging popup component
   useEffect(() => {
@@ -367,13 +325,17 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   // #endregion : effects
 
   return (
-    <PopupContainer
+    <DismissableContainer
       ref={popupContainerRef}
-      $coord={props.coord}
+      parentComponentName="popup"
+      $padding={0}
+      $border={'1px solid #000'}
       $isHovered={props.isHovered}
       $isVisible={props.isVisible}
+      $coord={props.coord}
+      $width={240}
     >
-      <PopupHeader $isParentHovered={props.isHovered} ref={headerBarRef}>
+      <PopupHeader ref={headerBarRef}>
         <PopupTitle>{props.title}</PopupTitle>
         <PopupCloseButton
           ref={closeButtonRef}
@@ -382,17 +344,19 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
           setHoveredPopupComponentName={setHoveredPopupComponentName}
         />
       </PopupHeader>
-      <PopupContent>
-        <p>{props.content}</p>
-      </PopupContent>
-      <PopupOkButton
-        ref={okButtonRef}
-        mouseActionState={popupComponentMouseActionStates.ok}
-        isHovered={hoveredPopupComponentName === 'ok'}
-        setHoveredPopupComponentName={setHoveredPopupComponentName}
-        okMessage="확인"
-      />
-    </PopupContainer>
+      <PopupBody>
+        <PopupContent>
+          <p>{props.content}</p>
+        </PopupContent>
+        <PopupOkButton
+          ref={okButtonRef}
+          mouseActionState={popupComponentMouseActionStates.ok}
+          isHovered={hoveredPopupComponentName === 'ok'}
+          setHoveredPopupComponentName={setHoveredPopupComponentName}
+          okMessage="확인"
+        />
+      </PopupBody>
+    </DismissableContainer>
   );
 });
 
