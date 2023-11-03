@@ -244,7 +244,7 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
   }, [props.isVisible]);
   // #endregion :: props.isVisible effect
 
-  // #region :: setting hoveredComponentName - cursorCoordX, cursorCoordY, popupComponentAppearances, props.isVisible, props.isHovered dependency
+  // #region :: setting hoveredPopupComponentName - cursorCoordX, cursorCoordY, popupComponentAppearances, props.isVisible, props.isHovered dependency
   useEffect(() => {
     if (props.isVisible && props.isHovered) {
       const hoveredComponentName = getPopupComponentNameFromPoint({
@@ -260,7 +260,7 @@ const Popup = forwardRef<HTMLDivElement, IPopupProps>((props, ref) => {
     props.isVisible,
     props.isHovered,
   ]);
-  // #endregion :: setting hoveredComponentName - cursorCoordX, cursorCoordY, popupComponentAppearances, props.isVisible, props.isHovered dependency
+  // #endregion :: setting hoveredPopupComponentName - cursorCoordX, cursorCoordY, popupComponentAppearances, props.isVisible, props.isHovered dependency
 
   // #region :: mouseActionState.isClickStarted, mouseActionState.isClickEnded, props.isHovered, hoveredPopupComponentName dependency
   useEffect(() => {

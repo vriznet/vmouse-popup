@@ -101,11 +101,9 @@ export const screenSlice = createSlice({
     ) {
       state.screenComponentAppearances = {
         ...state.screenComponentAppearances,
-        ...{
-          [action.payload.componentName]: {
-            ...state.screenComponentAppearances[action.payload.componentName],
-            ...action.payload.appearance,
-          },
+        [action.payload.componentName]: {
+          ...state.screenComponentAppearances[action.payload.componentName],
+          ...action.payload.appearance,
         },
       };
     },
@@ -140,28 +138,26 @@ export const screenSlice = createSlice({
       ) {
         state.screenComponentAppearances = {
           ...state.screenComponentAppearances,
-          ...{
-            [action.payload.componentName]: {
-              ...state.screenComponentAppearances[action.payload.componentName],
-              x: inrange(
-                state.screenComponentLastClickedCoords[
-                  action.payload.componentName
-                ].x + action.payload.deltaX,
-                action.payload.boundaryMargin,
-                action.payload.boundary.width -
-                  action.payload.componentWidth -
-                  action.payload.boundaryMargin
-              ),
-              y: inrange(
-                state.screenComponentLastClickedCoords[
-                  action.payload.componentName
-                ].y + action.payload.deltaY,
-                action.payload.boundaryMargin,
-                action.payload.boundary.height -
-                  action.payload.componentHeight -
-                  action.payload.boundaryMargin
-              ),
-            },
+          [action.payload.componentName]: {
+            ...state.screenComponentAppearances[action.payload.componentName],
+            x: inrange(
+              state.screenComponentLastClickedCoords[
+                action.payload.componentName
+              ].x + action.payload.deltaX,
+              action.payload.boundaryMargin,
+              action.payload.boundary.width -
+                action.payload.componentWidth -
+                action.payload.boundaryMargin
+            ),
+            y: inrange(
+              state.screenComponentLastClickedCoords[
+                action.payload.componentName
+              ].y + action.payload.deltaY,
+              action.payload.boundaryMargin,
+              action.payload.boundary.height -
+                action.payload.componentHeight -
+                action.payload.boundaryMargin
+            ),
           },
         };
       } else {

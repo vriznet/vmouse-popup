@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { ComponentMouseActionState } from './states';
-import { Coord, PopupComponentName } from './data';
+import { Coord, PopupComponentName, ScreenComponentName } from './data';
 
 export interface IButtonProps {
   mouseActionState: ComponentMouseActionState;
@@ -32,4 +32,18 @@ export interface IPopupOkButtonProps {
   isHovered: boolean;
   setHoveredPopupComponentName: Dispatch<SetStateAction<PopupComponentName>>;
   okMessage: string;
+}
+
+export interface IDismissableContainerProps {
+  children: React.ReactNode;
+  mouseActionState: ComponentMouseActionState;
+  parentComponentName: ScreenComponentName;
+  padding: number;
+  border: string;
+  $width: number;
+  $height: number;
+  $isHovered: boolean;
+  $isVisible: boolean;
+  $coord: Coord;
+  backgroundColor?: string;
 }
